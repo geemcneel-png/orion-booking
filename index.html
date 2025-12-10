@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Your Service - ORION</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 600px;
+            width: 100%;
+            padding: 40px;
+            animation: slideUp 0.5s ease;
+        }
+        
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .header h1 {
+            color: #1a202c;
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            color: #718096;
+            font-size: 16px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            color: #2d3748;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 15px;
+            transition: all 0.3s;
+            font-family: inherit;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+        
+        .signature-section {
+            margin: 25px 0;
+            padding: 20px;
+            background: #f7fafc;
+            border-radius: 12px;
+        }
+        
+        .signature-section h3 {
+            color: #2d3748;
+            margin-bottom: 15px;
+            font-size: 16px;
+            font-weight: 600;
+        }
+        
+        #signature-pad {
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            cursor: crosshair;
+            background: white;
+            display: block;
+            width: 100%;
+            touch-action: none;
+        }
+        
+        .signature-buttons {
+            margin-top: 10px;
+            display: flex;
+            gap: 10px;
+        }
+        
+        .btn-clear {
+            padding: 8px 16px;
+            background: #e53e3e;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: background 0.3s;
+        }
+        
+        .btn-clear:hover {
+            background: #c53030;
+        }
+        
+        .urgency-options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        
+        .urgency-option {
+            position: relative;
+        }
+        
+        .urgency-option input[type="radio"] {
+            position: absolute;
+            opacity: 0;
+        }
+        
+        .urgency-option label {
+            display: block;
+            padding: 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+        }
+        
+        .urgency-option input[type="radio"]:checked + label {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+        
+        .urgency-option label:hover {
+            border-color: #667eea;
+        }
+        
+        .btn-submit {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+            margin-top: 20px;
+        }
+        
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-submit:active {
+            transform: translateY(0);
+        }
+        
+        .btn-submit:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
+        .status-message {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: 600;
+            display: none;
+        }
+        
+        .status-message.success {
+            background: #c6f6d5;
+            color: #22543d;
+            display: block;
+        }
+        
+        .status-message.error {
+            background: #fed7d7;
+            color: #742a2a;
+            display: block;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            margin-top: 15px;
+        }
+        
+        .loading.active {
+            display: block;
+        }
+        
+        .spinner {
+            border: 3px solid #f3f4f6;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .required {
+            color: #e53e3e;
+        }
+        
+        @media (max-width: 640px) {
+            .container {
+                padding: 30px 20px;
+            }
+            
+            .header h1 {
+                font-size: 24px;
+            }
+            
+            .urgency-options {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📋 Book Your Service</h1>
+            <p>Fill in your details and we'll get back to you shortly</p>
+        </div>
+        
+        <form id="booking-form">
+            <div class="form-group">
+                <label for="name">Full Name <span class="required">*</span></label>
+                <input type="text" id="name" name="name" required placeholder="John Doe">
+            </div>
+            
+            <div class="form-group">
+                <label for="email">Email Address <span class="required">*</span></label>
+                <input type="email" id="email" name="email" required placeholder="john@example.com">
+            </div>
+            
+            <div class="form-group">
+                <label for="phone">Phone Number <span class="required">*</span></label>
+                <input type="tel" id="phone" name="phone" required placeholder="+27 XX XXX XXXX">
+            </div>
+            
+            <div class="form-group">
+                <label for="service">Service Required <span class="required">*</span></label>
+                <select id="service" name="service" required>
+                    <option value="">-- Select a Service --</option>
+                    <option value="Plumbing">Plumbing</option>
+                    <option value="Electrical">Electrical</option>
+                    <option value="Carpentry">Carpentry</option>
+                    <option value="Painting">Painting</option>
+                    <option value="General Maintenance">General Maintenance</option>
+                    <option value="Other">Other</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="details">Job Details <span class="required">*</span></label>
+                <textarea id="details" name="details" required placeholder="Please describe what needs to be done..."></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label>Urgency <span class="required">*</span></label>
+                <div class="urgency-options">
+                    <div class="urgency-option">
+                        <input type="radio" id="standard" name="urgency" value="Standard" required>
+                        <label for="standard">📅 Standard<br><small>1-3 days</small></label>
+                    </div>
+                    <div class="urgency-option">
+                        <input type="radio" id="emergency" name="urgency" value="Emergency" required>
+                        <label for="emergency">🚨 Emergency<br><small>Same day</small></label>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="signature-section">
+                <h3>✍️ Your Signature</h3>
+                <canvas id="signature-pad" width="500" height="150"></canvas>
+                <div class="signature-buttons">
+                    <button type="button" class="btn-clear" onclick="clearSignature()">Clear Signature</button>
+                </div>
+            </div>
+            
+            <button type="submit" class="btn-submit" id="submit-btn">Submit Booking Request</button>
+            
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p style="margin-top: 10px; color: #4a5568;">Processing your request...</p>
+            </div>
+            
+            <div class="status-message" id="status-message"></div>
+        </form>
+    </div>
+
+    <script>
+        // ⚠️ REPLACE THIS URL WITH YOUR APPS SCRIPT WEB APP URL
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxMJp7QOIJdtPVsta142nBLmo82GKY8O9yO2MOaBacA9Dl9nGkkeG3V9nzTs7Jx8r-8tg/exec';
+        
+        // Signature Pad Setup
+        const canvas = document.getElementById('signature-pad');
+        const ctx = canvas.getContext('2d');
+        let isDrawing = false;
+        let hasSignature = false;
+        
+        // Set canvas size based on display size
+        function resizeCanvas() {
+            const rect = canvas.getBoundingClientRect();
+            canvas.width = rect.width;
+            canvas.height = rect.height;
+        }
+        
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+        
+        // Drawing functions
+        function startDrawing(e) {
+            isDrawing = true;
+            hasSignature = true;
+            const pos = getPosition(e);
+            ctx.beginPath();
+            ctx.moveTo(pos.x, pos.y);
+        }
+        
+        function draw(e) {
+            if (!isDrawing) return;
+            
+            const pos = getPosition(e);
+            ctx.lineTo(pos.x, pos.y);
+            ctx.strokeStyle = '#000';
+            ctx.lineWidth = 2;
+            ctx.lineCap = 'round';
+            ctx.stroke();
+        }
+        
+        function stopDrawing() {
+            isDrawing = false;
+        }
+        
+        function getPosition(e) {
+            const rect = canvas.getBoundingClientRect();
+            const touch = e.touches ? e.touches[0] : e;
+            return {
+                x: touch.clientX - rect.left,
+                y: touch.clientY - rect.top
+            };
+        }
+        
+        // Mouse events
+        canvas.addEventListener('mousedown', startDrawing);
+        canvas.addEventListener('mousemove', draw);
+        canvas.addEventListener('mouseup', stopDrawing);
+        canvas.addEventListener('mouseout', stopDrawing);
+        
+        // Touch events
+        canvas.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            startDrawing(e);
+        });
+        canvas.addEventListener('touchmove', (e) => {
+            e.preventDefault();
+            draw(e);
+        });
+        canvas.addEventListener('touchend', stopDrawing);
+        
+        function clearSignature() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            hasSignature = false;
+        }
+        
+        // Form submission
+        document.getElementById('booking-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            if (!hasSignature) {
+                showMessage('Please provide your signature before submitting.', 'error');
+                return;
+            }
+            
+            const submitBtn = document.getElementById('submit-btn');
+            const loading = document.getElementById('loading');
+            const statusMessage = document.getElementById('status-message');
+            
+            // Disable button and show loading
+            submitBtn.disabled = true;
+            loading.classList.add('active');
+            statusMessage.style.display = 'none';
+            
+            // Get form data
+            const formData = {
+                name: document.getElementById('name').value,
+                email: document.getElementById('email').value,
+                phone: document.getElementById('phone').value,
+                service: document.getElementById('service').value,
+                details: document.getElementById('details').value,
+                urgency: document.querySelector('input[name="urgency"]:checked').value,
+                signature: canvas.toDataURL('image/png')
+            };
+            
+            try {
+                const response = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData)
+                });
+                
+                // Note: no-cors mode doesn't allow reading response, so we assume success
+                showMessage('✅ Booking submitted successfully! Check your email for the quotation.', 'success');
+                document.getElementById('booking-form').reset();
+                clearSignature();
+                
+            } catch (error) {
+                console.error('Error:', error);
+                showMessage('❌ Something went wrong. Please try again or contact us directly.', 'error');
+            } finally {
+                submitBtn.disabled = false;
+                loading.classList.remove('active');
+            }
+        });
+        
+        function showMessage(message, type) {
+            const statusMessage = document.getElementById('status-message');
+            statusMessage.textContent = message;
+            statusMessage.className = 'status-message ' + type;
+            statusMessage.style.display = 'block';
+            
+            if (type === 'success') {
+                setTimeout(() => {
+                    statusMessage.style.display = 'none';
+                }, 5000);
+            }
+        }
+    </script>
+</body>
+</html>
