@@ -111,6 +111,7 @@
             background: white;
             display: block;
             width: 100%;
+            height: 250px;
             touch-action: none;
         }
         
@@ -289,6 +290,20 @@
             </div>
             
             <div class="form-group">
+                <label>Booking Type <span class="required">*</span></label>
+                <div class="urgency-options">
+                    <div class="urgency-option">
+                        <input type="radio" id="booking" name="bookingType" value="Booking" checked>
+                        <label for="booking">📅 Book Now<br><small>Get quote & book</small></label>
+                    </div>
+                    <div class="urgency-option">
+                        <input type="radio" id="quote" name="bookingType" value="Quote">
+                        <label for="quote">💬 Request Quote<br><small>FREE - No commitment</small></label>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-group">
                 <label for="service">Service Required <span class="required">*</span></label>
                 <select id="service" name="service" required>
                     <option value="">-- Select a Service --</option>
@@ -322,7 +337,7 @@
             
             <div class="signature-section">
                 <h3>✍️ Your Signature</h3>
-                <canvas id="signature-pad" width="500" height="150"></canvas>
+                <canvas id="signature-pad" width="500" height="250"></canvas>
                 <div class="signature-buttons">
                     <button type="button" class="btn-clear" onclick="clearSignature()">Clear Signature</button>
                 </div>
@@ -434,6 +449,7 @@
             
             // Get form data
             const formData = {
+                bookingType: document.querySelector('input[name="bookingType"]:checked').value,
                 name: document.getElementById('name').value,
                 email: document.getElementById('email').value,
                 phone: document.getElementById('phone').value,
@@ -454,7 +470,12 @@
                 });
                 
                 // Note: no-cors mode doesn't allow reading response, so we assume success
-                showMessage('✅ Booking submitted successfully! Check your email for the quotation.', 'success');
+                const bookingType = document.querySelector('input[name="bookingType"]:checked').value;
+                const message = bookingType === 'Quote' 
+                    ? '✅ Quote request submitted! We\'ll send you a free quote within 24 hours.' 
+                    : '✅ Booking submitted successfully! Check your email for the quotation and payment link.';
+                
+                showMessage(message, 'success');
                 document.getElementById('booking-form').reset();
                 clearSignature();
                 
@@ -479,6 +500,18 @@
                 }, 5000);
             }
         }
+        
+        // Update submit button text based on booking type
+        document.querySelectorAll('input[name="bookingType"]').forEach(radio => {
+            radio.addEventListener('change', function() {
+                const submitBtn = document.getElementById('submit-btn');
+                if (this.value === 'Quote') {
+                    submitBtn.textContent = 'Request FREE Quote';
+                } else {
+                    submitBtn.textContent = 'Submit Booking Request';
+                }
+            });
+        });
     </script>
 </body>
 </html>
